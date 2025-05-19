@@ -2,6 +2,8 @@ import streamlit as st
 import streamlit_authenticator as stauth
 import openai
 import os
+import yaml
+from yaml.loader import SafeLoader
 import sqlite3
 import datetime
 import requests
@@ -11,22 +13,27 @@ from docx import Document
 from fpdf import FPDF
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 
-# --- CONFIG ---
 openai.api_key = os.getenv("OPENAI_API_KEY")
 SERPAPI_KEY = os.getenv("SERPAPI_API_KEY")
 DB_PATH = "user_logs.db"
 
-# --- AUTHENTICATION ---
-names = ['Admin User', 'Basic User']
-usernames = ['admin', 'user']
-passwords = ['admin_pass', 'user_pass']
-hashed_passwords = stauth.Hasher(passwords).generate()
-authenticator = stauth.Authenticate(names, usernames, hashed_passwords, 'cookie', 'secret', cookie_expiry_days=1)
+# --- AUTH ---
+with open('config.yaml') as file:
+    config = yaml.load(file, Loader=SafeLoader)
 
-name, auth_status, username = authenticator.login('Login', 'main')
-is_admin = username == 'admin'
+authenticator = stauth.Authenticate(
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days'],
+    config['preauthorized']
+)
+
+name, auth_status, username = authenticator.login("Login", "main")
+is_admin = username == 'user1@example.com' if username else False
 
 # Track usage limits in session
 if 'usage_count' not in st.session_state:
