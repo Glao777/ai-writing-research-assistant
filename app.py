@@ -10,6 +10,9 @@ from PyPDF2 import PdfReader
 from io import BytesIO
 from docx import Document
 from fpdf import FPDF
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # --- CONFIG ---
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -25,6 +28,17 @@ authenticator = stauth.Authenticate(names, usernames, hashed_passwords, 'cookie'
 
 name, auth_status, username = authenticator.login('Login', 'main')
 is_admin = username == 'admin'
+
+
+# Track usage limits in session
+if 'usage_count' not in st.session_state:
+    st.session_state.usage_count = 0
+
+# Example: limit to 5 API calls per session
+if st.session_state.usage_count >= 5:
+    st.warning("🚫 Free usage limit reached for this session (5 requests).")
+    st.stop()
+
 
 # --- DB SETUP ---
 def init_db():
@@ -133,26 +147,30 @@ if auth_status:
     output = ""
 
     if tab == "✍️ Write":
-        if st.button("Generate Content"):
+        if st.session_state.usage_count < 5 and st.button("Generate Content"):
+            st.session_state.usage_count += 1
             output = generate_ai_response(prompt_input)
             log_interaction(username, "Write", prompt_input, output)
             st.text_area("Output", output, height=300)
 
     elif tab == "🧾 Summarize":
-        if st.button("Summarize"):
+        if st.session_state.usage_count < 5 and st.button("Summarize"):
+            st.session_state.usage_count += 1
             output = generate_ai_response(f"Summarize this:\n{prompt_input}")
             log_interaction(username, "Summarize", prompt_input, output)
             st.text_area("Summary", output, height=300)
 
     elif tab == "🔍 Research":
-        if st.button("Search"):
+        if st.session_state.usage_count < 5 and st.button("Search"):
+            st.session_state.usage_count += 1
             summary = web_search(prompt_input)
             output = generate_ai_response(f"Based on this:\n{summary}")
             log_interaction(username, "Research", prompt_input, output)
             st.text_area("Research Summary", output, height=300)
 
     elif tab == "🛠️ Edit":
-        if st.button("Improve Text"):
+        if st.session_state.usage_count < 5 and st.button("Improve Text"):
+            st.session_state.usage_count += 1
             output = generate_ai_response(f"Edit and improve this:\n{prompt_input}")
             log_interaction(username, "Edit", prompt_input, output)
             st.text_area("Improved Text", output, height=300)
