@@ -6,5 +6,6 @@ requests
 PyPDF2
 python-docx
 fpdf
+streamlit-authenticator==0.2.2
 
 
