@@ -1,7 +1,10 @@
 streamlit
 streamlit-authenticator
 openai
+python-dotenv
 requests
 PyPDF2
 python-docx
 fpdf
+
+
