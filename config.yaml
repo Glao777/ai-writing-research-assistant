@@ -1,0 +1,18 @@
+credentials:
+  usernames:
+    user1@example.com:
+      name: Admin User
+      password: '$2b$12$kP8zv6FQyDfDmdg...hashedpw...'  # Replace with real hash
+    user2@example.com:
+      name: Basic User
+      password: '$2b$12$kP8zv6FQyDfDmdg...hashedpw...'
+
+cookie:
+  name: cookie
+  key: secret_key_to_sign_cookies
+  expiry_days: 1
+
+preauthorized:
+  emails:
+    - user1@example.com
+    - user2@example.com
