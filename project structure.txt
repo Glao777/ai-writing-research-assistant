@@ -1,0 +1,9 @@
+ai_assistant_app/
+│
+├── app.py
+├── requirements.txt
+├── setup.sh
+├── .env (with API keys)
+├── prompts.py      <-- NEW: stores prompt templates
+├── db.py           <-- NEW: database logging
+└── utils.py        <-- NEW: shared helper functions
